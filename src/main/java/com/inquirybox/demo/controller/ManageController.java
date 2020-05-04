@@ -72,6 +72,7 @@ public class ManageController implements QuestionContent, UserContent {
         model.addAttribute("flag",userLogin.getUserId()==user.getUserId()?"true":"false");
         model.addAttribute("path","manage");
         model.addAttribute("flag1",userLogin.getUserId()==user.getUserId()&&userLogin.getUserRole()==1?"true":"false");
+        model.addAttribute("path2","/quiryBox/"+userLogin.getUserName()+"/1");
 
         return "manage";
     }
