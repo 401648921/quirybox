@@ -1,8 +1,8 @@
-# quirybox# InquiryBox
+# InquiryBox
 
 ****
 
-链接<http://39.97.168.17:8080/login>
+链接<http://39.97.168.17:8080/quiryBox/SXCSXCSS/1
 
 ****
 
