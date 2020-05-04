@@ -1,0 +1,179 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>提问箱</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div style="color:#00BFFF" class="navbar navbar-fixed-top">
+    <h3>[[${userLogin.userName}]]</h3>
+    <a th:if="${userLogin.userRole}==3" href="/login">点击此处登录</a>
+    <a th:href="@{/logout(path=${path},userName=${user.userName})}" th:if="${userLogin.userRole} ne 3">点击此处注销</a>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <h1>QUIRY BOX</h1>
+    <p>[[${user.userName}]]的提问箱</p>
+</div>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">QuiryBox</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li ><a th:href="@{${path2}}">提问页面</a></li>
+                <li th:if="${flag} =='true' "><a href="/person">个人信息</a></li>
+                <li class="active" th:if="${flag1} =='true' "><a href="/manage">管理网站</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+
+        <div >
+            <div th:each="report,reportStat : ${reports}" class="col-lg-5  pull-right">
+                <div  class="container-fluid">
+                    <div class="accordion" id="accordion2">
+                        <div class="accordion-group">
+                            <div class="accordion-heading">
+                                <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" th:href="'#collapse'+${reportStat.index}">
+                                    [[${report.reportedId}]]号用户的被举报信息
+                                </a>
+                            </div>
+                            <div th:id="'collapse'+${reportStat.index}" class="accordion-body collapse" style="height: 0px; ">
+                                <div  class="accordion-inner">
+                                    [[${report.content}]]
+                                </div>
+                                <a th:if="${flag=='true'}" th:href="@{/search(reportedId=${report.reportedId})}">查看被举报用户信息</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="accordion-group" style="color: #2aabd2">
+    <div class="accordion-heading">
+        <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse">
+            前往特定用户的管理页
+        </a>
+    </div>
+    <div id="collapse" class="accordion-body collapse" style="height: 0px; ">
+        <form id="setReport" action='/searchDetail' method="post" >
+            <input id="csrf" name="_csrf" type="hidden" th:value="${_csrf.token}">
+            <input id="csrfHead" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+            <input type="text" class="form-control  col-md-12" id="content" name="reportedId" style="width:720px" placeholder="输入用户邮箱或用户名">
+            <button id="putReport" type='button'>提交</button>
+        </form>
+    </div>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+
+</div>
+<script>
+    var csrf = $("#csrf").val();
+    var csrgHead = $("#csrfHead").val();
+    var questionup = $("#questionText");
+    var buttonUp = $("#getTo");
+    buttonUp.click(function () {
+        if($("#questionText").val().trim().length==0){
+            alert("问题不能为空");
+            return false;
+        }
+        if(questionup.val().length>50){
+            alert("问题不能超过50个字");
+            return false;
+        }
+        $("#question").submit();
+    })
+    $("#buttonTo0").click(function () {
+        if($("#response0").val().trim().length==0||$("#response0").val().trim().length>100){
+            window.alert("回答长度错误");
+            return false;
+        }else{
+            $("#responseFrom0").submit();
+        }
+    })
+
+    $("#buttonTo1").click(function () {
+        if($("#response1").val().trim().length==0||$("#response1").val().trim().length>100){
+            window.alert("回答长度错误");
+            return false;
+        }else{
+            $("#responseFrom1").submit();
+        }
+    })
+
+    $("#buttonTo2").click(function () {
+        if($("#response2").val().trim().length==0||$("#response2").val().trim().length>100){
+            window.alert("回答长度错误");
+            return false;
+        }else{
+            $("#responseFrom2").submit();
+        }
+    })
+
+    $("#buttonTo3").click(function () {
+        if($("#response3").val().trim().length==0||$("#response3").val().trim().length>100){
+            window.alert("回答长度错误");
+            return false;
+        }else{
+            $("#responseFrom3").submit();
+        }
+    })
+    $("#blacklist").click(function () {
+        $.ajax({
+            type:"post",
+            url:"/updateblack",
+            data:{userName:$("#userIdon").val()},
+            dataType:'json',
+            success:function (data) {
+                if(data['result']== "black"){
+                    window.alert("拉黑成功");
+                    return true;
+                }else if(data['result']== "white"){
+                    window.alert("取消拉黑成功");
+                    return false;
+                }else{
+                    window.alert("修改失败");
+                    return false;
+                }
+            },
+            beforeSend: function(request) {
+                request.setRequestHeader(csrgHead, csrf);
+            },
+            error:function () {
+                alert("服务器超时");
+            }
+        })
+    })
+
+    $("#putReport").click(function () {
+        if($("#content").val().trim().length==0){
+            alert("用户名或邮箱不能为空");
+            return false;
+        }
+        if($("#content").val().length>50){
+            alert("用户名或邮箱不能超过50个字");
+            return false;
+        }
+       $("#setReport").submit();
+    })
+</script>
+</body>
+</html>

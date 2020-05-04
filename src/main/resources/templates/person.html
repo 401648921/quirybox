@@ -1,0 +1,346 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="md5.js"></script>
+
+</head>
+
+<body>
+<div style="color:#00BFFF" class="navbar navbar-fixed-top">
+    <h3>[[${userLogin.userName}]]</h3>
+    <a th:if="${userLogin.userRole}==3" href="/login">点击此处登录</a>
+    <a th:href="@{/logoutTo(path='manage',userName=${user.userName})}" th:if="${userLogin.userRole} ne 3">点击此处注销</a>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <h1>QUIRY BOX</h1>
+    <p>[[${user.userName}]]的提问箱</p>
+</div>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">QuiryBox</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li ><a th:href="@{${path1}}">提问页面</a></li>
+                <li class="active"><a href="#">个人信息</a></li>
+                <li th:if="${flag1} =='true' "><a href="/manage/1">管理网站</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <h5>我的头像:</h5>
+            <div  class="fakeimg">
+                <img height="200" width="200" th:src="@{${picPath}}"   />
+            </div>
+            <br>
+            <br>
+            <hr class="hidden-sm hidden-md hidden-lg">
+        </div>
+        <div class="col-lg-5  pull-right">
+            <div  class="container-fluid">
+                <div class="accordion" id="accordionpic">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapsepic">
+                                修改头像
+                            </a>
+                        </div>
+                        <div id="collapsepic" class="accordion-body collapse" style="height: 0px; ">
+                            <form id="Pict" action='/updatePic' method='post' enctype='multipart/form-data'>
+                                <input id="csrf" name="_csrf" type="hidden" th:value="${_csrf.token}">
+                                <input id="csrfHead" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+                                <input type="file" id="test-image-file" name="fileName" accept="image/gif, image/jpeg, image/png, image/jpg">
+                                <button id="putPic" type='button'>上传</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapsepwd">
+                                修改密码
+                            </a>
+                        </div>
+                        <div id="collapsepwd" class="accordion-body collapse" style="height: 0px; ">
+                            <form id="resetPwd" action='/' method='post' >
+                                <input  name="_csrf" type="hidden" th:value="${_csrf.token}">
+                                <input  name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+                                <input type="password" class="form-control  col-md-12" id="userPwd" name="userPwd" style="width:360px" placeholder="请输入旧密码">
+                                <input id="pwd" type="password" class="form-control  col-md-12"  name="newPassword" style="width:360px" placeholder="请输入密码">
+                                <input id="repwd" type="password" class="form-control  col-md-12"  style="width:360px" placeholder="请确认密码">
+                                <button id="putPwd" type='button'>提交</button>
+                                <br><br><br><br><br>
+                                <b id="showPwd"> 111</b>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseName">
+                                修改用户名
+                            </a>
+                        </div>
+                        <div id="collapseName" class="accordion-body collapse" style="height: 0px; ">
+                            <form id="resetName" action='/' method='post' >
+                                <input  name="_csrf" type="hidden" th:value="${_csrf.token}">
+                                <input  name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+                                <input type="text" class="form-control  col-md-12" id="userNameOut" name="userPwd" style="width:360px" placeholder="请输入新用户名">
+                                <button id="putName" type='button'>提交</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseEmail">
+                                修改邮箱
+                            </a>
+                        </div>
+                        <div id="collapseEmail" class="accordion-body collapse" style="height: 0px; ">
+                            <form id="resetEmail" action='/' method='post' >
+                                <input  name="_csrf" type="hidden" th:value="${_csrf.token}">
+                                <input  name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+                                <input type="email" class="form-control  col-md-12" id="emailOut" name="userEmail" style="width:360px" placeholder="请输入新邮箱">
+                                <input type="password" class="form-control  col-md-12" id="pwd1" name="userpwd1" style="width:360px" placeholder="请输入密码确认">
+                                <button id="putEmail" type='button'>提交</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseBox">
+                                提问箱开启情况
+                            </a>
+                        </div>
+                        <div id="collapseBox" class="accordion-body collapse" style="height: 0px; ">
+                            <form id="resetBox" action='/' method='post' >
+                                <input  name="_csrf" type="hidden" th:value="${_csrf.token}">
+                                <input  name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+                                <input id="userId1" type="hidden" th:value="${user.userId}">
+                                <div>[[${boxOpen}]]</div>
+                                <button id="putBox" type='button'>开启或关闭提问箱</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </div>
+</div>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <div th:if="${userLogin.userRole} ne 3" class="user-face">
+    </div>
+</div>
+<script>
+    var csrf = $("#csrf").val();
+    var csrgHead = $("#csrfHead").val();
+    var fileInput = $("#putPic");
+    // info = document.getElementById('test-file-info'),
+    // preview = document.getElementById('test-image-preview');
+    // 监听change事件:
+    fileInput.click(function () {
+        // 检查文件是否选择:
+        if(!$("#test-image-file").val()) {
+            window.alert("没有选择文件");
+            return false;
+        }
+       $("#Pict").submit();
+    })
+    //显示密码错误信息
+    function alter1(i) {
+        if(i==-1) {
+            $("#showPwd").text("");
+        }
+        else{
+            $("#showPwd").text("第" + (i + 1) + "字符错误");
+        }
+    }
+    //检查密码每一位
+    function test1Password() {
+        var flag = false;
+        var password1 = $("#pwd");
+        var repassword1 = $("#repwd");
+        var length1 = repassword1.val().length;
+        for(var i=0;i<length1;i++){
+            if(password1.val().charAt(i)!=repassword1.val().charAt(i)){
+                flag = true;
+                alter1(i)
+            }
+        }
+        if(flag == false){
+            alter1(-1);
+        }
+        flag = false;
+    }
+    $("#repwd").keyup(function () {
+        test1Password();
+    })
+
+    var testPassword = /^[0-9]*$/;
+    $("#putPwd").click(function () {
+        var password1 = $("#pwd");
+        var repassword1 = $("#repwd");
+        if(testPassword.test(password1.val())==true){
+            window.alert("密码不能是纯数字");
+            return false;
+        }
+        if(password1.val().length>12||password1.val().length<6){
+            window.alert("密码长度错误");
+            return false;
+        }
+        if(password1.val()!=repassword1.val()){
+            window.alert("确认密码不一致");
+            return false;
+        }
+        password1.val(hex_md5(password1.val()));
+        $("#userPwd").val(hex_md5($("#userPwd").val()));
+        $.ajax({
+            type:"post",
+            url:"/updatePwd",
+            data:{oldPwd:$("#userPwd").val(),pwd:password1.val()},
+            dataType:'json',
+            success:function (data) {
+                if(data['result']== "succeed"){
+                    password1.val("");
+                    repassword1.val("");
+                    window.alert("修改成功");
+                    return true;
+                }else{
+                    window.alert("修改失败");
+                    return false;
+                }
+            },
+            beforeSend: function(request) {
+                request.setRequestHeader(csrgHead, csrf);
+            },
+            error:function () {
+                alert("服务器超时");
+            }
+        })
+    })
+    $("#putName").click(function () {
+        var testName = /^[A-Za-z0-9]+$/;
+        var userName = $("#userNameOut");
+        if(userName.val().length>10||userName.val().length<6||testName.test(userName.val())==false){
+            window.alert("用户名错误");
+            return false;
+        }
+        $.ajax({
+            type:"post",
+            url:"/updateUserName",
+            data:{userName:userName.val()},
+            dataType:'json',
+            success:function (data) {
+                if(data['result']== "succeed"){
+                    userName.val("");
+                    window.alert("修改成功");
+                    window.open("/login");
+                    return true;
+                }else if(data['result']== "repeate"){
+                    window.alert("用户名重复");
+                    return false;
+                }else{
+                    window.alert("修改失败");
+                    return false;
+                }
+            },
+            beforeSend: function(request) {
+                request.setRequestHeader(csrgHead, csrf);
+            },
+            error:function () {
+                alert("服务器超时");
+            }
+        })
+    })
+
+    $("#putEmail").click(function () {
+        var userEmail = $("#emailOut")
+        var password2 = $("#pwd1");
+        if(testPassword.test(password2.val())==true){
+            window.alert("密码不能是纯数字");
+            return false;
+        }
+        if(password2.val().length>12||password2.val().length<6){
+            window.alert("密码长度错误");
+            return false;
+        }
+        $.ajax({
+            type:"post",
+            url:"/updateEmail",
+            data:{userEmail:userEmail.val(),userPwd:hex_md5(password2.val())},
+            dataType:'json',
+            success:function (data) {
+                if(data['result']== "succeed"){
+                    userEmail.val("");
+                    password2.val("");
+                    window.alert("修改成功,可到邮箱激活账号");
+                    window.open("/login");
+                    return true;
+                }else if(data['result']== "repeate"){
+                    window.alert("邮箱和原邮箱相同");
+                    return false;
+                }else if(data['result']== "repeate1"){
+                    window.alert("邮箱重复");
+                    return false;
+                }else{
+                    window.alert("修改失败");
+                    return false;
+                }
+            },
+            beforeSend: function(request) {
+                request.setRequestHeader(csrgHead, csrf);
+            },
+            error:function () {
+                alert("服务器超时");
+            }
+        })
+    })
+
+    $("#putBox").click(function () {
+        var userId = $("#userId1");
+        $.ajax({
+            type:"post",
+            url:"/updateBoxOpen",
+            data:{userName:userId.val()},
+            dataType:'json',
+            success:function (data) {
+                if(data['result']== "OPEN"){
+                    window.alert("提问箱开启成功");
+                    history.go(0);
+                    return true;
+                }else if(data['result']== "CLOSE"){
+                    window.alert("提问箱关闭成功");0
+                    history.go(0);
+                    return false;
+                }else{
+                    window.alert("操作失败");
+                    return false;
+                }
+            },
+            beforeSend: function(request) {
+                request.setRequestHeader(csrgHead, csrf);
+            },
+            error:function () {
+                alert("服务器超时");
+            }
+        })
+    })
+</script>
+</body>
+</html>

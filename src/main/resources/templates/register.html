@@ -1,0 +1,232 @@
+﻿
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>注册</title>
+
+</head>
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="md5.js"></script>
+<script src="bootstrap-3.3.7-dist/js/bootstrap.min.js" type="application/javascript"></script>
+<link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="style.css" />
+<!-- 登录 -->
+	<form id="ajaxForm" action="/register" method="post" class="register">
+		<input id="csrf" name="_csrf" type="hidden" th:value="${_csrf.token}">
+		<input id="csrfHead" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+		<ul>
+			<li>
+				<label for="">用 户 名 :</label>
+				<input id="userName" type="text" name="userName" class="userName">
+			</li>
+			<li>
+				<label for="">设置密码 :</label>
+				<input type="password" id="password" name="userPassword" class="pass">
+			</li>
+			<li>
+				<label for="">确认密码 :</label>
+				<input type="password" id="repassword" class="repass">
+			</li>
+			<li>
+				<label for="">邮箱地址 :</label>
+				<input id="Email" type="text" name="userEmail" class="mobile">
+			</li>
+			<li>
+				<label for="">验证码 :</label>
+				<input id="test" type="text" name="verifyCodeActual" class="code">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				<img id="captcha_img" alt="点击更换" title="点击更换"
+					 onclick="refresh()" src="/kaptcha" />
+			</li>
+			<li>
+				<label for=""></label>
+				<input id="userRegister" type="button" class="submit " value="立即注册">
+			</li>
+		</ul>
+	</form>
+	<div id="alet" class="alert alert-success alert-dismissible">
+	<b id="testUser">1</b>
+</div>
+</div>
+<script type="text/javascript">
+	var csrf = $("#csrf").val();
+	var csrgHead = $("#csrfHead").val();
+	var userName1=$("#userName");   //用户名
+	var userPassword=$("#password");   //用户密码
+	var userTest=$("#test");    //验证码
+	var userEmail=$("#Email");   //邮箱
+	var userRePassword=$("#repassword");   //重复密码
+	function alter1(i) {
+		if(i==-1) {
+			$("#testUser").text("");
+		}
+		else{
+			$("#testUser").text("第" + (i + 1) + "字符错误");
+		}
+	}
+	//验证密码每一位是否正确，和事件键盘按键松开绑定
+	function test1Password() {
+		var flag = false;
+		var password1 = $("#password");
+		var repassword1 = $("#repassword");
+		var length1 = repassword1.val().length;
+		for(var i=0;i<length1;i++){
+			if(password1.val().charAt(i)!=repassword1.val().charAt(i)){
+				flag = true;
+				alter1(i)
+			}
+		}
+		if(flag == false){
+			alter1(-1);
+		}
+		flag = false;
+	}
+	$("#repassword").keyup(function () {
+		test1Password();
+	})
+	var testName = /^[A-Za-z0-9]+$/;
+	var testEmail = /^[A-Za-z0-9]+([_\.][A-Za-z0-9]+)*@([A-Za-z0-9\-]+\.)+[A-Za-z]{2,6}$/;
+	var testPassword = /^[0-9]*$/;
+	//提交前的检查
+	var flag = true;
+	$("#userRegister").click(function () {
+		flag = true;
+		if(userName1.val().length>10||userName1.val().length<6||testName.test(userName1.val())==false){
+			$("#testUser").text("用户名错误");
+			return false;
+		}
+		if(testPassword.test(userPassword.val())==true){
+			$("#testUser").text("密码不能是纯数字");
+			return false;
+		}
+		if(userPassword.val().length>12||userPassword.val().length<6){
+			$("#testUser").text("密码长度错误");
+			return false;
+		}
+		if(userPassword.val()!=userRePassword.val()){
+			$("#testUser").text("确认密码不一致");
+			return false;
+		}
+		if(testEmail.test(userEmail.val())==false){
+			$("#testUser").text("邮箱格式错误");
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"/testUserName",
+			data:{userName:userName1.val()},
+			dataType:'json',
+			success:function (data) {
+				if(data['result']!= "succeed"){
+					flag = false;
+					window.alert("用户名重复");
+					return false;
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader(csrgHead, csrf);
+			},
+			error:function () {
+				$("#testUser").text("服务器超时");
+			}
+		})
+		$.ajax({
+			type:"post",
+			url:"/testEmail",
+			data:{userEmail:userEmail.val()},
+			dataType:'json',
+			success:function (data) {
+				if(data['result']!= "succeed"){
+					flag = false;
+					window.alert("邮箱重复");
+					return false;
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader(csrgHead, csrf);
+			},
+			error:function () {
+				$("#testUser").text("服务器超时");
+			}
+		})
+		$.ajax({
+			type:"post",
+			url:"/testCode",
+			data:{verifyCodeActual:userTest.val()},
+			dataType:'json',
+			success:function (data) {
+				if(data['result']!= "succeed"){
+					flag = false;
+					window.alert("验证码错误");
+					return false;
+				}else{
+					userPassword.val(hex_md5(userPassword.val()));
+					if(flag == true){
+						$("#ajaxForm").submit();
+					}
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader(csrgHead, csrf);
+			},
+			error:function () {
+				window.alert("服务器超时");
+			}
+		})
+
+		return true;
+	})
+	$("#Email").blur(function () {
+		var Emailout = userEmail.val();
+		$.ajax({
+			type:"post",
+			url:"/testEmail",
+			data:{userEmail:Emailout},
+			dataType:'json',
+			success:function (data) {
+				if(data['result']!= "succeed"){
+					$("#testUser").text("邮箱重复");
+					return false;
+				}else{
+					$("#testUser").text("");
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader(csrgHead, csrf);
+			},
+			error:function () {
+				$("#testUser").text("服务器超时");
+			}
+		})
+	})
+	$("#userName").blur(function () {
+		var userName = userName1.val();
+		$.ajax({
+			type:"post",
+			url:"/testUserName",
+			data:{userName:userName},
+			dataType:'json',
+			success:function (data) {
+				if(data['result']!= "succeed"){
+					$("#testUser").text("用户名重复");
+					return false;
+				}else{
+					$("#testUser").text("");
+				}
+			},
+			beforeSend: function(request) {
+				request.setRequestHeader(csrgHead, csrf);
+			},
+			error:function () {
+				$("#testUser").text("服务器超时");
+			}
+		})
+	})
+	function refresh() {
+		document.getElementById('captcha_img').src="/kaptcha?"+Math.random();
+	}
+</script>
+</body>
+
+</html>

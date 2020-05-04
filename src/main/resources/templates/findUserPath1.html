@@ -1,0 +1,32 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+</head>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<body>
+<div id="takeOn" style="top:50% ; left:50%">
+    <form role="form"  action="/createFindPassword">
+        <input id="csrf" name="_csrf" type="hidden" th:value="${_csrf.token}">
+        <input id="csrfHead" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+        <div class="form-group">
+            <p style="color: #31b0d5 ; font-size:30px">输入您的邮箱，找回您的密码</p>
+            <label for="email">邮箱</label>
+            <br>
+            <input type="email" class="form-control  col-md-12" id="email" name="userEmail" style="width:360px" placeholder="请输入邮箱">
+            <button type="submit" class="btn btn-default">提交</button>
+        </div>
+    </form>
+</div>
+
+<link rel="stylesheet" href="quiryBoxPath1.css"/>
+<script>
+    var csrf = $("#csrf").val();
+    var csrgHead = $("#csrfHead").val();
+
+</script>
+</body>
+</html>

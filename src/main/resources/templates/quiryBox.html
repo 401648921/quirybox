@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>提问箱</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div style="color:#00BFFF" class="navbar navbar-fixed-top">
+    <h3>[[${userLogin.userName}]]</h3>
+    <a th:if="${userLogin.userRole}==3" href="/login">点击此处登录</a>
+    <a th:href="@{/logout(path=${path},userName=${user.userName})}" th:if="${userLogin.userRole} ne 3">点击此处注销</a>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <h1>QUIRY BOX</h1>
+    <p>[[${user.userName}]]的提问箱</p>
+</div>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">QuiryBox</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">提问页面</a></li>
+                <li th:if="${flag} =='true' "><a href="/person">个人信息</a></li>
+                <li th:if="${flag1} =='true' "><a href="/manage/1">管理网站</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<input id="csrf1" name="_csrf" type="hidden" th:value="${_csrf.token}">
+<input id="csrfHead1" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>关于我</h2>
+            <h5>我的头像:</h5>
+            <div  class="fakeimg">
+                <img height="200" width="200" th:src="@{${picPath}}"   />
+            </div>
+            <button id="blacklist" th:if="${flag} !='true'"  th:text="${black}=='true'?'取消拉黑':'拉黑这个人'">拉黑这个人</button>
+            <h3>问题</h3>
+            <p>翻页</p>
+            <ul class="nav nav-pills nav-stacked">
+                <li th:class="${page}==1?'active':'unww'"><a th:if="${pageAll}>0" href="1">第 1 页</a></li>
+                <li th:class="${page}==2?'active':'unww'"><a th:if="${pageAll}>1" href="2">第 2 页</a></li>
+                <li th:class="${page}==3?'active':'unww'"><a th:if="${pageAll}>2" href="3">第 3 页</a></li>
+                <li th:class="${page}==4?'active':'unww'"><a th:if="${pageAll}>3" href="4">第 4 页</a></li>
+            </ul>
+            <hr class="hidden-sm hidden-md hidden-lg">
+        </div>
+        <div >
+        <div th:each="question,questionStat : ${questions}" class="col-lg-5  pull-right">
+            <div  class="container-fluid">
+                <div class="accordion" id="accordion2">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" th:href="'#collapse'+${questionStat.index}">
+                                [[${question.content}]]
+                            </a>
+                        </div>
+                        <div th:id="'collapse'+${questionStat.index}" class="accordion-body collapse" style="height: 0px; ">
+                            <div  class="accordion-inner">
+                              [[${question.response}]]
+                            </div>
+                            <form action="updateQuestion" th:id="'responseFrom'+${questionStat.index}" th:if="${question.response==null && flag=='true'}">
+                                <input id="csrf" name="_csrf" type="hidden" th:value="${_csrf.token}">
+                                <input id="csrfHead" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+                                <input type="hidden" name="questionId" th:value="${question.id}">
+                                <textarea th:id="'response'+${questionStat.index}" cols="80"  type="text" name="response" rows="5" placeholder="此处回复问题" class="txt"></textarea>
+                                <button th:id="'buttonTo'+${questionStat.index}">发布</button>
+                            </form>
+                                <a th:if="${flag=='true'}" th:href="@{/updateQuestion(questionId=${question.id})}">删除该问题</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse">
+            举报该用户
+        </a>
+    </div>
+    <div id="collapse" class="accordion-body collapse" style="height: 0px; ">
+        <form id="setReport" action='/createReport' method='post' >
+            <input  name="_csrf" type="hidden" th:value="${_csrf.token}">
+            <input  name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+            <input id="userId1" type="hidden" name="userId" th:value="${user.userId}">
+            <input type="text" class="form-control  col-md-12" id="content" name="content" style="width:720px" placeholder="输入举报原因">
+            <button id="putReport" type='button'>提交</button>
+        </form>
+    </div>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <div th:if="${boxOpen} ne 'false'" class="user-face">
+        <form action="/putQuestion" method="get" id="question">
+            <input name="_csrf" type="hidden" th:value="${_csrf.token}">
+            <input  name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+            <input id="userIdon" type="hidden" name="userName" th:value="${user.userName}">
+            <textarea id="questionText" cols="80"  type="text" name="content" rows="5" placeholder="此处向该用户提问" class="ipt-txt"></textarea>
+            <button id="getTo" type="button" class="comment-submit">发布</button>
+        </form>
+    </div>
+</div>
+<script>
+    var csrf = $("#csrf1").val();
+    var csrgHead = $("#csrfHead1").val();
+var questionup = $("#questionText");
+var buttonUp = $("#getTo");
+buttonUp.click(function () {
+    if($("#questionText").val().trim().length==0){
+        alert("问题不能为空");
+        return false;
+    }
+    if(questionup.val().length>50){
+        alert("问题不能超过50个字");
+        return false;
+    }
+    $("#question").submit();
+})
+    $("#buttonTo0").click(function () {
+        if($("#response0").val().trim().length==0||$("#response0").val().trim().length>100){
+            window.alert("回答长度错误");
+            return false;
+        }else{
+            $("#responseFrom0").submit();
+        }
+    })
+
+    $("#buttonTo1").click(function () {
+    if($("#response1").val().trim().length==0||$("#response1").val().trim().length>100){
+        window.alert("回答长度错误");
+        return false;
+    }else{
+        $("#responseFrom1").submit();
+     }
+    })
+
+    $("#buttonTo2").click(function () {
+    if($("#response2").val().trim().length==0||$("#response2").val().trim().length>100){
+        window.alert("回答长度错误");
+        return false;
+    }else{
+        $("#responseFrom2").submit();
+    }
+    })
+
+    $("#buttonTo3").click(function () {
+    if($("#response3").val().trim().length==0||$("#response3").val().trim().length>100){
+        window.alert("回答长度错误");
+        return false;
+    }else{
+        $("#responseFrom3").submit();
+    }
+})
+$("#blacklist").click(function () {
+    $.ajax({
+        type:"post",
+        url:"/updateblack",
+        data:{userName:$("#userIdon").val()},
+        dataType:'json',
+        success:function (data) {
+            if(data['result']== "black"){
+                window.alert("拉黑成功");
+                return true;
+            }else if(data['result']== "white"){
+                window.alert("取消拉黑成功");
+                return false;
+            }else{
+                window.alert("修改失败");
+                return false;
+            }
+        },
+        beforeSend: function(request) {
+            request.setRequestHeader(csrgHead, csrf);
+        },
+        error:function () {
+            alert("服务器超时");
+        }
+    })
+})
+
+$("#putReport").click(function () {
+    if($("#content").val().trim().length==0){
+        alert("举报信息不能为空");
+        return false;
+    }
+    if($("#content").val().length>50){
+        alert("举报信息不能超过50个字");
+        return false;
+    }
+    $.ajax({
+        type:"post",
+        url:"/createReport",
+        data:{userId:$("#userId1").val(),content:$("#content").val()},
+        dataType:'json',
+        success:function (data) {
+            if(data['result']== "succeed"){
+                $("#content").val("");
+                window.alert("提交成功");
+                return true;
+            }else{
+                window.alert("提交失败");
+                return false;
+            }
+        },
+        beforeSend: function(request) {
+            request.setRequestHeader(csrgHead, csrf);
+        },
+        error:function () {
+            alert("服务器超时");
+        }
+    })
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>提问箱</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+<div style="color:#00BFFF" class="navbar navbar-fixed-top">
+    <h3>[[${userLogin.userName}]]</h3>
+    <a th:if="${userLogin.userRole}==3" href="/login">点击此处登录</a>
+    <a th:href="@{/logout(path=${path},userName=${user.userName})}" th:if="${userLogin.userRole} ne 3">点击此处注销</a>
+</div>
+
+
+<div class="jumbotron text-center" style="margin-bottom:0">
+    <h1>QUIRY BOX</h1>
+    <p>[[${user.userName}]]的提问箱</p>
+</div>
+
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">QuiryBox</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li ><a th:href="@{${pathOne}}">提问页面</a></li>
+                <li ><a href="/person">个人信息</a></li>
+                <li class="active" ><a href="/manage/1">管理网站</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>激活状态  [[${active}]]</h3>
+            <h3>封禁情况  [[${ban}]]</h3>
+            <h3>问题箱问题数  [[${askedlistPageAll}]]</h3>
+            <h3>提问的数量 [[${askListPageAll}]]</h3>
+            <h3>回复提问的问题  [[${respenseListPageAll}]]</h3>
+
+            <h3>问题</h3>
+            <p>翻页</p>
+            <ul class="nav nav-pills nav-stacked">
+                <li th:class="${pageAll}==1?'active':'unww'"><a th:if="${page}>0" href="1">第 1 页</a></li>
+                <li th:class="${pageAll}==2?'active':'unww'"><a th:if="${page}>1" href="2">第 2 页</a></li>
+                <li th:class="${pageAll}==3?'active':'unww'"><a th:if="${page}>2" href="3">第 3 页</a></li>
+                <li th:class="${pageAll}==4?'active':'unww'"><a th:if="${page}>3" href="4">第 4 页</a></li>
+            </ul>
+            <hr class="hidden-sm hidden-md hidden-lg">
+        </div>
+
+            <div style="height:120px">
+                <p>提问箱的问题</p>
+        <div th:each="question,questionStat : ${askedList}" class="col-lg-5  pull-right">
+            <div  class="container-fluid">
+                <div class="accordion" id="accordion0">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion0" th:href="'#collapse'+${questionStat.index}">
+                                [[${question.content}]]
+                            </a>
+                        </div>
+                        <div th:id="'collapse'+${questionStat.index}" class="accordion-body collapse" style="height: 0px; ">
+                            <div  class="accordion-inner">
+                                [[${question.response}]]
+                            </div>
+                            <div th:if="${question.getQuestionState()==0}">
+                                该问题已经被删除
+                            </div>
+                            <a style="color: #761c19" th:href="@{/updateQuestion(questionId=${question.id})}">删除或回复该问题</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+            </div>
+                <div style="height:120px">
+                <p>他提出的问题</p>
+        <div th:each="question,questionStat : ${askList}" class="col-lg-5  pull-right">
+            <div  class="container-fluid">
+                <div class="accordion" id="accordion1">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" th:href="'#collapse1'+${questionStat.index}">
+                                [[${question.content}]]
+                            </a>
+                        </div>
+                        <div th:id="'collapse1'+${questionStat.index}" class="accordion-body collapse" style="height: 0px; ">
+                            <div  class="accordion-inner">
+                                [[${question.response}]]
+                            </div>
+                            <div th:if="${question.getQuestionState()==0}">
+                                该问题已经被删除
+                            </div>
+                            <a style="color: #761c19" th:href="@{/updateQuestion(questionId=${question.id})}">删除或回复该问题</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+                </div>
+
+        <div style="height:100px">
+            <p>他回答的问题</p>
+        <div   th:each="question,questionStat : ${respenseList}" class="col-lg-5  pull-right">
+            <div  class="container-fluid">
+                <div class="accordion" id="accordion2">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a  class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" th:href="'#collapse2'+${questionStat.index}">
+                                [[${question.content}]]
+                            </a>
+                        </div>
+                        <div th:id="'collapse2'+${questionStat.index}" class="accordion-body collapse" style="height: 0px; ">
+                            <div  class="accordion-inner">
+                                [[${question.response}]]
+                            </div>
+                            <div th:if="${question.getQuestionState()==0}">
+                                该问题已经被删除
+                            </div>
+                            <a style="color: #761c19" th:href="@{/updateQuestion(questionId=${question.id})}">删除或回复该问题</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <input id="userId1" type="hidden" th:value="${user.userId}">
+        <input id="csrf" name="_csrf" type="hidden" th:value="${_csrf.token}">
+        <input id="csrfHead" name="_csrf_header" type="hidden" th:value="${_csrf.headerName}"/>
+        <button  id="toBan">
+            解禁或封禁该用户
+        </button>
+    </div>
+</div>
+<div class="jumbotron text-center" style="margin-bottom:0">
+
+</div>
+<script>
+    var csrf = $("#csrf").val();
+    var csrgHead = $("#csrfHead").val();
+        $("#toBan").click(function () {
+            $.ajax({
+
+                type:"post",
+                url:"/toBan",
+                data:{userId:$("#userId1").val()},
+                dataType:'json',
+                success:function (data) {
+                    if(data['result']== "ban"){
+                        window.alert("封禁成功");
+                        history.go(0);
+                        return true;
+                    }else if(data['result']== "noBan"){
+                        window.alert("取消封禁成功");
+                        history.go(0);
+                        return true;
+                    }else{
+                        window.alert("操作失败");
+                        return false;
+                    }
+                },
+                beforeSend: function(request) {
+                    request.setRequestHeader(csrgHead, csrf);
+                },
+                error:function () {
+                    alert("服务器超时");
+                }
+            })
+        })
+
+</script>
+</body>
+</html>

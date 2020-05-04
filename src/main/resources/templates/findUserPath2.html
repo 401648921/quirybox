@@ -1,0 +1,69 @@
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+</head>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="http://localhost:8080/md5.js"></script>
+<body>
+<div id="takeOn" style="top:50% ; left:50%">
+    <form id="Taking" role="form"  action="/createFindPassword" method="post">
+        <input type="hidden" name="ciphertext" th:value="${text1}">
+        <input type="hidden" name="userId" th:value="${userId1}">
+        <div class="form-group">
+            <p style="color: #31b0d5 ; font-size:30px">重新确认你的密码</p>
+            <label for="pwd">密码</label>
+            <br>
+            <input id="pwd" type="password" class="form-control  col-md-12"  name="userPassword" style="width:360px" placeholder="请输入密码">
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="repwd">确认密码</label>
+            <br>
+            <input id="repwd" type="password" class="form-control  col-md-12"  style="width:360px" placeholder="请确认密码">
+            <button id="sub" type="button" class="btn btn-default">提交</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var csrf = $("#csrf").val();
+    var csrgHead = $("#csrfHead").val();
+    var userPwd = $("#pwd");
+    var userRePwd = $("#repwd");
+    var buttonSub = $("#sub");
+    var testPassword3 = /^[0-9]*$/;
+    buttonSub.click(function () {
+        if(userPwd.val().length<6){
+            window.alert("密码长度错误");
+            return false;
+        }
+        if(testPassword3.test(userPwd.val())==true){
+            window.alert("密码不能是纯数字");
+            return false;
+        }
+        if(userPwd.val()!=userRePwd.val()){
+            window.alert("密码不一致");
+            return false;
+        }
+        userPwd.val(hex_md5(userPwd.val()));
+        $("#Taking").submit();
+        return true;
+    })
+</script>
+<style>
+    #takeOn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -150px 0 0 -200px;
+        width: 800px;
+        height: 300px;
+    }
+</style>
+</body>
+</html>
